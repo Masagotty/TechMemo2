@@ -11,11 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.activeandroid.query.Select;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
-public class MemoCreateActivity extends AppCompatActivity {
+public class MemoDetailActivity extends AppCompatActivity {
 
     MemoDB mMemoDB;
     EditText mTitle;
@@ -24,20 +27,20 @@ public class MemoCreateActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_memo_create);
-        Toolbar memoCreateToolbar = (Toolbar) findViewById(R.id.memoCreate_toolbar);
-        setSupportActionBar(memoCreateToolbar);
+        setContentView(R.layout.activity_memo_detail);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        mTitle = (EditText) findViewById(R.id.create_title);
-        mMemo = (EditText) findViewById(R.id.create_memo);
-        mMemoDB = new MemoDB();
+        mTitle = (EditText)findViewById(R.id.detail_title);
+        mMemo = (EditText)findViewById(R.id.detail_memo);
 
+        setMemo();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_memo_create, menu);
+        getMenuInflater().inflate(R.menu.menu_memo_detail, menu);
         return true;
     }
 
@@ -48,8 +51,8 @@ public class MemoCreateActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (R.id.create_save == id) {
-            saveMemo();
+        if (R.id.detail_save == id) {
+            upDateMemo();
             finish();
 
             return true;
@@ -58,11 +61,19 @@ public class MemoCreateActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void saveMemo(){
+    void setMemo() {
+        Intent i = getIntent();
+        List<MemoDB> memoList = new Select().from(MemoDB.class).where("date = ?", i.getStringExtra("date")).execute();
+        mMemoDB = memoList.get(0);
+        mTitle.setText(mMemoDB.title);
+        mMemo.setText(mMemoDB.memo);
+    }
+
+    void upDateMemo(){
         mMemoDB.title = mTitle.getText().toString();
         mMemoDB.memo = mMemo.getText().toString();
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ", Locale.JAPANESE);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPANESE);
         mMemoDB.date = sdf.format(date);
         mMemoDB.save();
     }

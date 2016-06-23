@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -29,6 +30,16 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mListView = (ListView)findViewById(R.id.memo_list);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MemoDB data = (MemoDB) parent.getItemIdAtPosition(position);
+                Intent i = new Intent(MainActivity.this, MemoDetailActivity.class);
+                i.putExtra("date", data.date);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
